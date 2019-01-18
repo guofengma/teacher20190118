@@ -1,0 +1,112 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="wrap">
+    <teacher-menu teacherName="{{teacherName}}" classInfo="" isopen="{{isopen}}" bind:powerDrawer="powerDrawer"></teacher-menu>
+    <swiper-change title-one="我的课表" title-two="高思校历">
+        <view slot="leftSwiper" class="tabBodyItem" style="height:{{heigh-34-55}}px;">
+                <view class="checkDate">
+                  <view class="checkDateWrap">
+                    <view class="date" bindtap="showFloat">{{change_year}}年{{change_month}}月</view>
+                    <view class="leftArrowWrap" data-handle="prev" bindtap="handleCalendar">
+                      <view class="leftArrow"></view>
+                    </view>
+                    <view class="rightArrowWrap" data-handle="next" bindtap="handleCalendar">
+                      <view class="rightArrow"></view>
+                    </view>
+                    <view class="bottomArrow"></view>
+                  </view>
+                  <view class="today" bindtap="tapToday" data-now="today">今天</view>
+                </view>
+                <view class="month">
+                  <view class="monthTitle flex">
+                    <block wx:for="{{weekArr}}" wx:key="index">
+                      <view style="width:{{100/7}}%;text-align:center; color:{{index==5 || index==6 ? '#888':'#888'}}">{{item}}</view>
+                    </block>
+                  </view>
+                  <view class="monthBody flex">
+
+                    <view wx:if="{{hasEmptyGrid}}" wx:for="{{empytGrids}}" wx:key="{{index}}" data-idx="{{index}}" style="width:{{100/7}}%;"></view>
+                    <block wx:for="{{days}}" wx:key="index">
+                      <view class="item"  style="width:{{100/7}}%;" bindtap="tapDayItem" data-idx="{{index}}">
+                        <view class="num  {{item.classInfo.length?'haveClass':''}} {{index == cur_day-1?'nowDayColor':''}} {{item.choosed==true?'tipColor':''}}" >{{item.day}}</view>
+                      </view>
+                    </block>
+                  </view>
+                </view>
+                <view class="selectDetail" style="height:{{}}px;">
+                  <view class="detailItem" wx:for="{{classContent}}" wx:key="index" wx:for-index="fatherIndex">
+                    <view class="baseInfo flex">
+                      <view class="dot">●</view>
+                      <view class="content">
+                         <view>{{item.dtDateSect}} <text style="color:#1FB923;" wx:if="{{item.bTeacherChanged == 1}}">代 {{item.sTeacherName}}</text></view>
+                         <view>{{item.title}}</view>
+                         <view class="address"><text wx:if="{{!item.sRoomName}}">{{item.sAreaName}}</text>{{item.sRoomName==null? '':item.sRoomName}}</view>
+                         <!-- <view class="zhibo">{{item.sOnlineClassTime==null?'':item.sOnlineClassTime}}</view> -->
+                      </view>
+                      <view class="kejie">第{{item.nLessonNo}}讲</view>
+                    </view>
+                    <!-- 直播信息 -->
+                    <view class="player" wx:for="{{item.player}}" wx:for-item="player" wx:for-index="childIndex" wx:key="childIndex">
+                     <view class="player-title player-title1 flex">
+                       <text>{{player.liveName}} {{player.BeginTime}}上课</text>
+                       <text class="status" style="color:{{player.status == 0?'#333':'#1fba21'}}">{{player.status == 0?'未开始':(player.status == 1?'上课中':'已下课')}}</text>
+                     </view>
+                     <view class="player-title flex">
+                       <view>
+                         <text class="iconfont icon-headportrait"></text>
+                         <text bindtap="goPlayStudengPage" data-fatherindex="{{fatherIndex}}" data-childindex="{{childIndex}}" style="color: #989898" wx:if="{{player.status == 0}}">{{player.online}}人在线</text>
+                         <text bindtap="goPlayStudengPage" data-fatherindex="{{fatherIndex}}" data-childindex="{{childIndex}}" wx:elif="{{player.status == 1}}">在线 {{player.online}} / {{player.total}}</text>
+                         <text bindtap="goPlayStudengPage" data-fatherindex="{{fatherIndex}}" data-childindex="{{childIndex}}" wx:elif="{{player.status == 2}}">学员名单</text>
+                       </view>
+                       <text class="status" bindtap="goRoom" data-fatherindex="{{fatherIndex}}" data-childindex="{{childIndex}}" wx:if="{{player.status == 0 || player.status == 1 }}" style="color:{{player.status == 0?'#989898':'#333'}}"><text class="play-icon"></text>观看直播</text>
+                       <text class="status" bindtap="goRoom" data-fatherindex="{{fatherIndex}}" data-childindex="{{childIndex}}" wx:if="{{player.status == 2}}"><text class="play-icon"></text>观看回放</text>
+                     </view>
+                   </view>
+                  </view>
+                  <!-- 无课程 -->
+                  <view class="detailItem detailItem1 flex" wx:if="{{classContent!= null && !classContent.length}}">
+                    <view class="dot dot1">●</view>
+                    <view class="content">
+                       <view>今日无课程</view>
+                    </view>
+                    <view class="kejie">--</view>
+                  </view>
+                </view>
+        </view>
+        <view slot="rightSwiper" class="tabBodyItem" style="height:{{heigh-34-55}}px;overflow-y: scroll;">
+          <view><image src="{{picSrc}}" bindtap="previewImage" mode='widthFix' style="width:100%;" ></image></view>
+        </view>
+    </swiper-change>
+  </view>
+
+<!-- 年月浮窗 -->
+  <view class="float" wx:if="{{show}}"  data-id="float" bindtap="closeFloat">
+    <view class="floatWrap flex">
+      <div class="year">
+        <view style="padding-top:0 ;"><image src="/../pages/images/nianyue.png"></image></view>
+        <block wx:for="{{yearArr}}" wx:key="index">
+          <view style="color:{{cur_year == item?'#1FBB1C':'#888'}}" bindtap="changeBgColor1" data-cur="{{item}}">{{item}}</view>
+        </block>
+      </div>
+      <div class="month flex">
+        <block wx:for="{{monthArr}}" wx:key="index">
+          <view style="margin-top:0 ; background:{{cur_month-1 == index?'#1FBB1C':'#fff'}};color:{{cur_month-1 == index?'#fff':'#888'}}" bindtap="changeBgColor" data-cur="{{item}}">{{item}}</view>
+        </block>
+      </div>
+    </view>
+  </view>
+
+
+  
+  <menu id="menu" 
+  isopen="{{isopen}}"
+  identity="{{identity}}" 
+  show-modal-status="{{showModalStatus}}"
+  zoom-show="{{zoomShow}}" 
+  teacher-name="{{teacherName}}"
+  animation-data="{{animationData}}"
+  bind:closeMenuEvent="closeNav">
+  </menu>
+  
+  <tab id="tab" tabbar-arr="{{tabBarArr}}" no-auditing="{{noAuditing}}"></tab>
+</view>

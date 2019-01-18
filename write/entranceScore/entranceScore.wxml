@@ -1,0 +1,69 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="wrap">
+    <teacher-menu teacherName="" classInfo="{{classStr}}" isopen="{{isopen}}" bind:powerDrawer="powerDrawer"></teacher-menu>
+    <view class="choise flex">
+      <select type="class" typeInn="{{classInn}}" bind:getEvent="getClass"></select>
+      <select type="kejie" typeInn="{{kejieInn}}" bind:getEvent="getKejie"></select>
+    </view>
+    <form bindsubmit="saveScore">
+      <view class="thead flex">
+        <view class="sNumber">序号</view>
+        <view class="sName">姓名</view>
+        <view class="sSchool">得分</view>
+      </view>
+      <view class="tbody" style="height:{{resultH}}px">
+        <view class="tbody-row flex" wx:for="{{studentsList}}" wx:key="id">
+          <!-- <input  class="hidInp" name="datas[{{index}}][sClassCode]" value="{{item.sClassCode}}" />
+          <input  class="hidInp" name="datas[{{index}}][nLessonNo]" value="{{item.nLessonNum}}" />
+          <input  class="hidInp" name="datas[{{index}}][sCardCode]" value="{{item.sCardCode}}" />
+          <input  class="hidInp" name="datas[{{index}}][sStudentCode]" value="{{item.sStudentCode}}"/>
+          <input  class="hidInp" name="datas[{{index}}][ScoreType]" value="{{item.ScoreType}}" /> -->
+          <view class="sNumber">{{index+1}}</view>
+          <view class="sName">{{item.sName}}</view>
+          <view class="sSchool" wx:if="{{parentTarget == 'enterdoor'}}">
+            <input type="digit" bindinput="changeValue" bindblur="checkScore" value="{{item.Score}}"  placeholder="{{item.tipText}}" disabled="{{item.disable}}" focus="{{isFocus}}" data-index="{{index}}" />
+            <!-- <input type="digit" bindblur="checkScore" value="{{item.Score}}" name="datas[{{index}}][Score]" placeholder="{{item.tipText}}" disabled="{{item.disable}}" focus="{{isFocus}}" /> -->
+          </view>
+          <view class="sSchool" wx:if="{{parentTarget == 'outdoor'}}">
+            <!-- 调出不可录入 -->
+            <text wx:if="{{item.changeLessonState=='调出'}}">不可录入</text>
+            <!-- 不超过20小时且还未录入 -->
+            <button wx:if="{{nowTime < taskEndtime  && item.dStudentTotalScore==null&&item.changeLessonState!='调出'}}" bindtap="goOutScore" data-index="{{index}}">录入</button>
+            <!-- 不超过20小时且已录入 可修改-->
+            <button wx:if="{{nowTime < taskEndtime && item.dStudentTotalScore>=0&&item.dStudentTotalScore!=null&&item.changeLessonState!='调出'}}" bindtap="goOutScore" data-index="{{index}}">{{item.dStudentTotalScore}}</button>
+            <!-- 超过时间, 已经录入 -->
+            <text  wx:if="{{nowTime > taskEndtime && item.dStudentTotalScore>=0&&item.dStudentTotalScore!=null&&item.changeLessonState!='调出'}}" data-index="{{index}}">{{item.dStudentTotalScore}}</text>
+            <!-- 未超过时间未录入 -->
+            <text wx:if="{{nowTime > taskEndtime && item.dStudentTotalScore==null&&item.changeLessonState!='调出'}}" style="color:red;">未录入</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="btn" wx:if="{{parentTarget == 'enterdoor'}}">
+        <button formType="submit" class="loginBtn" hover-class="hoverLogin" disabled="{{!studentsList.length}}">保存</button>
+      </view>
+    </form>
+  </view>
+
+  
+  <select-popup id="selectPopup" 
+  show="{{show}}" 
+  is-ajax-over="{{isAjaxOver}}" 
+  arr="{{arr}}"
+  bind:cancelEvent="closePopup"  
+  catch:confirmEvent="getIndex">
+  </select-popup>
+
+  <menu id="menu" 
+  isopen="{{isopen}}"
+  identity="{{identity}}" 
+  show-modal-status="{{showModalStatus}}"
+  zoom-show="{{zoomShow}}" 
+  teacher-name="{{teacherName}}"
+  animation-data="{{animationData}}"
+  bind:closeMenuEvent="closeNav">
+  </menu>
+  
+<tab id="tab" tabbar-arr="{{tabBarArr}}" no-auditing="{{noAuditing}}"></tab>
+</view>

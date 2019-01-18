@@ -1,0 +1,4 @@
+<view class="choiseItem" bindtap="_getEvent"  id="{{type}}" data-id="{{type}}">
+  {{typeInn}}
+  <text class="iconfont icon-arrowdownbold"></text>
+</view>
